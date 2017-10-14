@@ -258,11 +258,11 @@ P_FM = fftshift(fft(pFM,N0));
 x_FM = fftshift(fft(xFM,N0));
 
 BTp = 320;
-fidx_p = find((fc-2*BTp)<=f & f<=(fc+BTp));
+fidx_p = find((fc-2*BTp)<=f & f<=(fc+2*BTp));
 fkeep_p = f(fidx_p);
 
 BTx = 600;
-fidx_x = find((fc-2*BTx)<=f & f<=(fc+BTx));
+fidx_x = find((fc-2*BTx)<=f & f<=(fc+2*BTx));
 fkeep_x = f(fidx_x);
 
 P_FMkeep = P_FM(fidx_p);
@@ -294,3 +294,10 @@ title('Magnitude Response')
 xlabel('f (Hz)')
 ylabel('Magnitude (dB)')
 xlim([min(fkeep_x) max(fkeep_x)])
+
+%8e)
+% From plot, which uses the universal curve BT, it is clear that
+% this is an overestimate for both signals,
+% the p magnitude respone finishes sloping off around 
+% plus or minus 500 Hz, and plus or minus 1000 Hz for x1,
+% making carsons rule an underestimate for both
