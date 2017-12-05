@@ -3,7 +3,7 @@
 %11/13/17
 
 close all
-%load('projIB.mat')
+load('projIB.mat')
 
 %specs
 fs = 44100;

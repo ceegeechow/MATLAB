@@ -1,0 +1,16 @@
+%Camille Chow
+%ECE-310-B
+%Spectrogram Analysis and Applications
+%12/11/17
+
+%Part 1
+N = 256;
+fs = 5e6;
+mu = 4e9;
+t = (0:1/fs:200e-6);
+x = cos(2*pi*mu.*(t.^2));
+window = triang(N);
+spectrogram(x,window,255,N,'yaxis')
+
+%Part 2
+
