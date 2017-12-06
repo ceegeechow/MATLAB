@@ -1,0 +1,236 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>DSP_project3</title><meta name="generator" content="MATLAB 9.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-12-06"><meta name="DC.source" content="DSP_project3.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Part 1 - generating chirp and plotting spectrogram</a></li><li><a href="#3">Part 2 - instantaneous frequency</a></li><li><a href="#4">Part 3 - new chirp rate</a></li><li><a href="#5">Part 4 - narrowband spectrogram</a></li><li><a href="#6">Part 5 - wideband spectrogram</a></li><li><a href="#7">Part 6 - ISTFT</a></li><li><a href="#8">Part 7 - changing rate of speech</a></li></ul></div><pre class="codeinput"><span class="comment">%Camille Chow</span>
+<span class="comment">%ECE-310-B</span>
+<span class="comment">%Spectrogram Analysis and Applications</span>
+<span class="comment">%12/11/17</span>
+</pre><h2 id="2">Part 1 - generating chirp and plotting spectrogram</h2><pre class="codeinput">N = 256;
+fs = 5e6;
+mu = 4e9;
+t = (0:1/fs:200e-6);
+chirp = cos(2*pi*mu*(t.^2));
+window = triang(N);
+spectrogram(chirp,window,255,N,<span class="string">'yaxis'</span>)
+</pre><img vspace="5" hspace="5" src="DSP_project3_01.png" alt=""> <h2 id="3">Part 2 - instantaneous frequency</h2><pre class="codeinput">figure
+f1 = mu*t;
+f2 = 2*mu*t;
+w1 = f1*pi/fs;
+w2 = f2*pi/fs;
+plot(t,w1,t,w2);
+title(<span class="string">'Instantaneous Frequency Functions'</span>)
+xlabel(<span class="string">'t (s)'</span>)
+ylabel(<span class="string">'w (rad)'</span>)
+legend(<span class="string">'w1'</span>,<span class="string">'w2'</span>)
+<span class="comment">%according to plot, f1 corresponds to slope of ridge</span>
+</pre><img vspace="5" hspace="5" src="DSP_project3_02.png" alt=""> <h2 id="4">Part 3 - new chirp rate</h2><pre class="codeinput">figure
+mu2 = 1e10;
+x2 = cos(2*pi*mu2*(t.^2));
+spectrogram(x2,window,255,N,<span class="string">'yaxis'</span>)
+<span class="comment">%if mu becomes too large, the chirp frequency will exceed the</span>
+<span class="comment">%Nyquist frequency, which is why the rigde begins to slope down</span>
+</pre><img vspace="5" hspace="5" src="DSP_project3_03.png" alt=""> <h2 id="5">Part 4 - narrowband spectrogram</h2><pre class="codeinput">fftlen = 256;
+winlen = 16;
+overlap = 15;
+load(<span class="string">'s1.mat'</span>);
+load(<span class="string">'s5.mat'</span>);
+w = triang(winlen);
+figure
+subplot(2,1,1)
+spectrogram(s1,w,overlap,fftlen,<span class="string">'yaxis'</span>)
+subplot(2,1,2)
+spectrogram(s5,w,overlap,fftlen,<span class="string">'yaxis'</span>)
+</pre><img vspace="5" hspace="5" src="DSP_project3_04.png" alt=""> <h2 id="6">Part 5 - wideband spectrogram</h2><pre class="codeinput">fftlen = 512;
+winlen = 512;
+overlap = 511;
+<span class="comment">% load('s1.mat');</span>
+<span class="comment">% load('s5.mat');</span>
+w = triang(winlen);
+figure
+subplot(2,1,1)
+spectrogram(s1,w,overlap,fftlen,<span class="string">'yaxis'</span>)
+subplot(2,1,2)
+spectrogram(s5,w,overlap,fftlen,<span class="string">'yaxis'</span>)
+</pre><img vspace="5" hspace="5" src="DSP_project3_05.png" alt=""> <h2 id="7">Part 6 - ISTFT</h2><pre class="codeinput">load(<span class="string">'vowels.mat'</span>);
+s1 = spectrogram(vowels,rectwin(256),128,1023);
+s2 = flipud(s1);
+s = [s1;s2]; <span class="comment">%complete spectrogram</span>
+y = invSTFT(s);
+figure
+subplot(2,1,1)
+plot(vowels)
+subplot(2,1,2)
+plot(y)
+title(<span class="string">'Input vs Output Signal'</span>)
+<span class="comment">%soundsc(vowels)</span>
+<span class="comment">%soundsc(y)</span>
+</pre><img vspace="5" hspace="5" src="DSP_project3_06.png" alt=""> <h2 id="8">Part 7 - changing rate of speech</h2><pre class="codeinput">s = s.';
+s = downsample(s,2);
+s = s.';
+y = invSTFT(s);
+figure
+subplot(2,1,1)
+plot(vowels)
+subplot(2,1,2)
+plot(y)
+title(<span class="string">'Original vs Modified Signal'</span>)
+<span class="comment">%soundsc(vowels)</span>
+<span class="comment">%soundsc(y)</span>
+</pre><img vspace="5" hspace="5" src="DSP_project3_07.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%Camille Chow
+%ECE-310-B
+%Spectrogram Analysis and Applications
+%12/11/17
+
+%% Part 1 - generating chirp and plotting spectrogram
+N = 256;
+fs = 5e6;
+mu = 4e9;
+t = (0:1/fs:200e-6);
+chirp = cos(2*pi*mu*(t.^2));
+window = triang(N);
+spectrogram(chirp,window,255,N,'yaxis')
+
+%% Part 2 - instantaneous frequency
+figure
+f1 = mu*t;
+f2 = 2*mu*t;
+w1 = f1*pi/fs;
+w2 = f2*pi/fs;
+plot(t,w1,t,w2);
+title('Instantaneous Frequency Functions')
+xlabel('t (s)')
+ylabel('w (rad)')
+legend('w1','w2')
+%according to plot, f1 corresponds to slope of ridge
+
+%% Part 3 - new chirp rate
+figure
+mu2 = 1e10;
+x2 = cos(2*pi*mu2*(t.^2));
+spectrogram(x2,window,255,N,'yaxis')
+%if mu becomes too large, the chirp frequency will exceed the
+%Nyquist frequency, which is why the rigde begins to slope down
+
+%% Part 4 - narrowband spectrogram
+fftlen = 256;
+winlen = 16;
+overlap = 15;
+load('s1.mat');
+load('s5.mat');
+w = triang(winlen);
+figure
+subplot(2,1,1)
+spectrogram(s1,w,overlap,fftlen,'yaxis')
+subplot(2,1,2)
+spectrogram(s5,w,overlap,fftlen,'yaxis')
+
+%% Part 5 - wideband spectrogram
+fftlen = 512;
+winlen = 512;
+overlap = 511;
+% load('s1.mat');
+% load('s5.mat');
+w = triang(winlen);
+figure
+subplot(2,1,1)
+spectrogram(s1,w,overlap,fftlen,'yaxis')
+subplot(2,1,2)
+spectrogram(s5,w,overlap,fftlen,'yaxis')
+
+%% Part 6 - ISTFT
+load('vowels.mat');
+s1 = spectrogram(vowels,rectwin(256),128,1023);
+s2 = flipud(s1);
+s = [s1;s2]; %complete spectrogram
+y = invSTFT(s);
+figure
+subplot(2,1,1)
+plot(vowels)
+subplot(2,1,2)
+plot(y)
+title('Input vs Output Signal')
+%soundsc(vowels)
+%soundsc(y)
+
+%% Part 7 - changing rate of speech
+s = s.';
+s = downsample(s,2);
+s = s.';
+y = invSTFT(s);
+figure
+subplot(2,1,1)
+plot(vowels)
+subplot(2,1,2)
+plot(y)
+title('Original vs Modified Signal')
+%soundsc(vowels)
+%soundsc(y)
+##### SOURCE END #####
+--></body></html>
