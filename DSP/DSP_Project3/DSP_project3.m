@@ -61,10 +61,10 @@ spectrogram(s5,w,overlap,fftlen,'yaxis')
 
 %% Part 6
 load('vowels.mat');
-s = spectrogram(vowels,rectwin(256),128,1023);
+s1 = spectrogram(vowels,rectwin(256),128,1023);
 %complete spectrogram
 s2 = flipud(s);
-s = [s;s2];
+s = [s1;s2];
 y = invSTFT(s);
 x1 = (0:1:length(vowels));
 x2 = (0:1:length(y));
@@ -74,3 +74,15 @@ stem(vowels)
 subplot(2,1,2)
 stem(real(y))
 title('Input vs Output Signal')
+
+%% Part 7
+s = downsample(s,2);
+y = invSTFT(s);
+figure
+subplot(2,1,1)
+stem(vowels)
+subplot(2,1,2)
+stem(real(y))
+title('Original vs Modified Signal')
+sound(vowels,8000)
+sound(y,8000)
